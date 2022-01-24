@@ -9,14 +9,13 @@ import * as productListValidations from "../../validations/validateProductListPa
 import * as cartPageValidations from "../../validations/validateCartPage.js"
 import * as checkoutPageValidations from "../../validations/validateCheckoutPage.js"
 import * as successPageValidations from "../../validations/validateSuccessPage.js"
+import userTest from "../../fixtures/testUser.json"
 
 const login = new LoginPage();
 const productList = new ProductListPage();
 const checkout = new CheckoutPage();
 const cart = new CartPage();
 const success = new SuccessPage();
-
-const url = "https://www.saucedemo.com/"
 
 Given('User opens Swag Labs home page', () => {
     login.getUrl();
@@ -25,8 +24,9 @@ Given('User opens Swag Labs home page', () => {
 });
 
 When('User logs in as standard user', () => {
-    login.usernameField().type('standard_user');
-    login.passwordField().type('secret_sauce');
+    cy.fixture('testUser').as('userTest')
+    login.usernameField().type(userTest.username);
+    login.passwordField().type(userTest.password);
     login.logInButton().click();
 });
 
@@ -48,17 +48,12 @@ Then('User checks the products in their cart and goes to check out', () => {
 });
 
 And('User inputs {string}, {string} and {string} and completes their purchase', (firstName, lastName, postcode) => {
-    checkout.firstNameInput(lastName);
-    checkout.lastNameInput(lastName);
-    checkout.postcodeInput(postcode);
+    checkout.firstNameInput().type(userTest.firstName);
+    checkout.lastNameInput().type(userTest.lastName);
+    checkout.postcodeInput().type(userTest.postcode);
     checkout.continueButton().click();
     checkoutPageValidations.validateFinishButton();
     checkout.finishButton().click(); 
     successPageValidations.validateHeaderText();
     successPageValidations.validateTitle();
 });
-
-
-
-
-
